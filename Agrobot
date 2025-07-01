@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Agrobot - Temperatura MAX6675</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>Temperatura Solo - Leituras do MAX6675</h2>
+  <canvas id="graficoTemperatura" width="800" height="400"></canvas>
+
+  <script>
+    const url = "https://zwhhjhybrpgfbjqtdddf.supabase.co/rest/v1/leituras_agrobot?select=data_hora,temperatura&order=data_hora";
+    const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3aGhqaHlicnBnZmJqcXRkZGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzODc2OTEsImV4cCI6MjA2Njk2MzY5MX0.uCiLBFYZb3f5fIhqtzKIYbpZ4UwNgn1olig7vP5eTxk";
+
+    fetch(url, {
+      headers: {
+        'apikey': apiKey
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const labels = data.map(item => new Date(item.data_hora).toLocaleString());
+      const temperaturas = data.map(item => item.temperatura);
+
+      const ctx = document.getElementById('graficoTemperatura').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Temperatura (°C)',
+            data: temperaturas,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            fill: false
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Data e Hora'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Temperatura (°C)'
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Erro ao buscar dados:', error));
+  </script>
+</body>
+</html>
